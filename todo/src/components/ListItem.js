@@ -3,9 +3,9 @@ import Item from './Item'
 
 function ListItem(props) {
 
-    const listTodo = props.todos.map((todo, index) => <Item key={index} no={index + 1} task={todo} />)
+    const listTodo = props.todos.map((todo, index) => <Item key={index} todo={todo} resend={props.resend} />)
     return (
-        <ul>{listTodo}</ul>
+        <ol>{listTodo}</ol>
     )
 }
 

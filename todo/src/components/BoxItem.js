@@ -22,7 +22,9 @@ export default class BoxItem extends Component {
         request.get('/todos')
             .then(function (response) {
                 // console.log(response)
-                this.setState({ todos: response.data });
+                let todos = response.data.map(item => ({ ...item, sent: true }))
+                console.log(todos)
+                this.setState({ todos: todos });
             }.bind(this))
             .catch(function (error) {
                 alert(error);
@@ -30,28 +32,60 @@ export default class BoxItem extends Component {
     }
 
     addTodo(todo) {
+        const id = Date.now();
+
         this.setState((state, props) => ({
-            todos: [...state.todos, todo]
+            todos: [...state.todos, { id: id, task: todo, sent: true }]
         }));
-        request.post('/todos',{
-            task: todo
+        request.post('/todos', {
+            id, task: todo
         })
             .then(function (response) {
                 // console.log(response)
-                this.setState({ todos: response.data });
+                //this.setState({ todos: response.data });
             }.bind(this))
             .catch(function (error) {
-                alert(error);
-            })
+                this.setState((state, props) => {
+
+                    return {
+                        todos: state.todos.map(item => {
+                            if (item.id == id) {
+                                item.sent = false
+                            }
+                            return item
+                        })
+                    }
+                });
+            }.bind(this))
     }
 
+    resendTodo = (todo) => {
+        request.post('/todos', todo)
+            .then(function (response) {
+                this.setState((state, props) => {
+
+                    return {
+                        todos: state.todos.map(item => {
+                            if (item.id == todo.id) {
+                                item.sent = true
+                            }
+                            return item
+                        })
+                    }
+                });
+            }.bind(this))
+            .catch(function (error) {
+
+
+            }.bind(this))
+    }
 
     render() {
 
         return (
             <div>
                 <FormItem tambah={this.addTodo} />
-                <ListItem todos={this.state.todos} />
+                <ListItem todos={this.state.todos} resend={this.resendTodo} />
             </div>
         )
     }

@@ -8,12 +8,17 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-  todos.push(req.body.task)
+  todos.push(
+    {
+      id: req.body.id,
+      task: req.body.task
+    }
+  )
   res.json(todos)
 });
 
 router.delete('/:id', function (req, res, next) {
-  todos.splice(req.params.id, 1)
+  todos = todos.filter(item => item.id != req.params.id)
   res.json(todos)
 });
 
